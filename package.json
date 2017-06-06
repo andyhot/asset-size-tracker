@@ -1,0 +1,17 @@
+{
+  "name": "asset-size-tracker",
+  "version": "0.1.0",
+  "description": "Track and graph size of assets in a web app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.1",
+    "lowdb": "^0.16.2",
+    "prettyjson": "^1.2.1"
+  }
+}

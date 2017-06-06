@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script src="https://d3js.org/d3.v3.min.js"></script>
+      <script src="db.js"></script>
+      <style>
+
+        .chart div {
+            font: 10px sans-serif;
+            background-color: steelblue;
+            text-align: right;
+            padding: 3px;
+            margin: 1px;
+            color: white;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        </style>
+  </head>
+  <body>
+
+    <script>
+        _sizeData.forEach(function(d){ d.time = new Date(d.created_ts) });
+
+	function init() {
+	    svg = d3.select("body")
+            .append("svg");
+
+	    svg.append("g")
+            .attr('class', 'axis x');
+	    svg.append("g")
+            .attr('class', 'axis y');
+	}
+
+	function render() {
+//        var w = 700, h = 400, padding = 50;
+	var w = window.innerWidth*0.95, h = w*9/16, padding = 50;
+        var yMax = 200000 + d3.max(_sizeData, d => d.scripts_size);
+        var xMax = 30*24*60*60*1000 + d3.max(_sizeData, d => d.created_ts);
+        var xMin = -30*24*60*60*1000 + d3.min(_sizeData, d => d.created_ts);
+        var y = d3.scale.linear().domain([yMax, 0]).range([0, h]);
+        var x = d3.time.scale().domain([xMin, xMax]).range([0, w]);
+
+        svg.attr("width", w).attr("height", h);
+
+	var circles = svg.selectAll('circle');
+
+	if (circles[0].length === 0) {
+	var dd = circles.data(_sizeData);
+
+        dd
+        .enter().append('circle').attr('class', 's1')
+        .attr('r', 3).attr('fill', 'blue');
+
+        dd
+        .enter().append('circle').attr('class', 's2')
+        .attr('r', 3).attr('fill', 'red');
+	}
+
+	svg.selectAll('circle.s1')
+        .attr('cx', function(d) {return x(d.created_ts);})
+        .attr('cy', function(d) {return y(d.scripts_size);});
+
+	svg.selectAll('circle.s2')
+        .attr('cx', function(d) {return x(d.created_ts);})
+        .attr('cy', function(d) {return y(d.styles_size);});
+
+        svg.select('.x.axis')
+            .attr("transform", "translate(0," + (h - padding) + ")")
+            .call(d3.svg.axis()
+                .scale(x)
+                .orient("bottom").ticks(5).tickFormat(d3.time.format("%Y-%d-%m")));
+
+        svg.select('.y.axis')
+            .attr("transform", "translate(" + padding + ",0)")
+            .call(d3.svg.axis()
+                .scale(y)
+                .orient("left").ticks(5).tickFormat(d3.format('s')));
+	}
+
+	init();
+	render();
+
+	window.addEventListener('resize', render);
+    </script>
+  </body>
+</html>
